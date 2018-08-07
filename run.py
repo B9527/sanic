@@ -1,3 +1,4 @@
+import pymongo
 from sanic import Sanic
 from app import bp
 from app.config_file import SERVER_SETTINGS
@@ -5,6 +6,9 @@ from app.config_file import SERVER_SETTINGS
 
 app = Sanic(__name__)
 app.blueprint(bp)
+
+client = pymongo.MongoClient(host='localhost', port=27017)
+test = client.test
 
 
 # request middleware
@@ -17,6 +21,7 @@ async def print_on_request(request):
 @app.middleware('response')
 async def print_on_response(request, response):
     response.headers["Server"] = "Fake-Server"
+    response.headers["content-type"] = "application/json"
     print("I print when a response is returned by the server")
 
 
@@ -28,4 +33,5 @@ async def print_on_response(request, response):
 
 if __name__ == "__main__":
     print("app-config:", app.config.keys())
+    print(client.test.runoob)
     app.run(**SERVER_SETTINGS)
